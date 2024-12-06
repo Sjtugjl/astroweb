@@ -1,0 +1,334 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+// 获取最新财经资讯（这里用博客文章模拟，实际项目中可以接入财经API）
+const posts = await getCollection('blog');
+const latestNews = posts
+  .sort((a, b) => new Date(b.data.publishDate).getTime() - new Date(a.data.publishDate).getTime())
+  .slice(0, 3);
+
+// 模拟项目进度数据
+const projects = [
+  { name: '项目A', progress: 75, status: 'progress' },
+  { name: '项目B', progress: 30, status: 'warning' },
+  { name: '项目C', progress: 100, status: 'complete' },
+];
+
+// 修改日历安排数据结构
+const nextSevenDays = Array.from({length: 7}, (_, i) => {
+  const date = new Date();
+  date.setDate(date.getDate() + i);
+  return {
+    date,
+    dayName: new Intl.DateTimeFormat('zh-CN', { weekday: 'short' }).format(date),
+    dayNumber: date.getDate(),
+    schedules: i === 0 ? [
+      { time: '09:00', event: '晨会', type: 'meeting' },
+      { time: '14:30', event: '项目评审', type: 'review' },
+      { time: '16:00', event: '客户沟通', type: 'call' },
+    ] : i === 1 ? [
+      { time: '10:00', event: '团队周会', type: 'meeting' },
+      { time: '15:00', event: '代码审核', type: 'review' },
+    ] : i === 2 ? [
+      { time: '09:30', event: '产品研讨', type: 'meeting' },
+      { time: '16:30', event: '项目交付', type: 'call' },
+    ] : i === 3 ? [
+      { time: '11:00', event: '技术分享', type: 'meeting' },
+    ] : i === 4 ? [
+      { time: '14:00', event: '月度总结', type: 'review' },
+    ] : i === 5 ? [
+      { time: '15:30', event: '团建活动', type: 'call' },
+    ] : [
+      { time: '10:30', event: '周末计划', type: 'meeting' },
+    ]
+  };
+});
+
+// 座右铭
+const motto = "Stay hungry, stay foolish.";
+
+// 获取当前日期和时间
+const now = new Date();
+const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const currentDate = now.toLocaleDateString('zh-CN', dateOptions);
+
+// 添加市场指标数据
+const marketIndicators = [
+  { name: '上证指数', value: '3,024.56', change: '+0.82%', trend: 'up', color: 'from-red-400 to-red-500' },
+  { name: '国证2000', value: '6,782.45', change: '-0.31%', trend: 'down', color: 'from-green-400 to-green-500' },
+  { name: '人民币汇率', value: '7.2341', change: '-0.05%', trend: 'down', color: 'from-blue-400 to-blue-500' },
+  { name: '黄金指数', value: '2,183.25', change: '+0.45%', trend: 'up', color: 'from-yellow-400 to-yellow-500' },
+  { name: '比特币', value: '63,421', change: '+1.24%', trend: 'up', color: 'from-orange-400 to-orange-500' },
+  { name: '铜期货', value: '8,842', change: '-0.18%', trend: 'down', color: 'from-cyan-400 to-cyan-500' },
+];
+---
+
+<BaseLayout title="我的个人空间">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+    <!-- 添加市场指标卡片（放在第一个位置） -->
+    <div class="lg:col-span-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow overflow-hidden">
+      <h2 class="text-xl font-bold mb-6 text-white flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+        </svg>
+        市场指标监测
+      </h2>
+      <div class="flex flex-wrap gap-4 justify-center">
+        {marketIndicators.map(indicator => (
+          <div class={`relative group transform hover:scale-105 transition-all duration-300 
+                      bg-gradient-to-br ${indicator.color} 
+                      rounded-lg p-4 shadow-lg hover:shadow-xl
+                      w-[calc(33.333%-1rem)] min-w-[200px]`}
+          >
+            <div class="text-white">
+              <div class="text-sm opacity-90 mb-1">{indicator.name}</div>
+              <div class="text-2xl font-bold mb-1">{indicator.value}</div>
+              <div class={`text-sm flex items-center ${
+                indicator.trend === 'up' ? 'text-red-100' : 'text-green-100'
+              }`}>
+                {indicator.trend === 'up' ? (
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                ) : (
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                  </svg>
+                )}
+                {indicator.change}
+              </div>
+            </div>
+            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-300"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 日期天气卡片 -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">{currentDate}</h2>
+          <p class="text-gray-500 mt-2">
+            <span id="weather" class="inline-flex items-center">
+              <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span id="temperature">加载中...</span>
+            </span>
+          </p>
+        </div>
+        <div class="text-4xl font-bold text-primary">
+          {now.getDate()}
+        </div>
+      </div>
+    </div>
+
+    <!-- 座右铭卡片 -->
+    <div class="bg-gradient-to-br from-primary to-purple-600 text-white rounded-xl shadow-md p-6 flex items-center justify-center">
+      <div class="text-center">
+        <svg class="w-8 h-8 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <p class="text-xl font-medium italic">"{motto}"</p>
+      </div>
+    </div>
+
+    <!-- 财经资讯卡片 -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+        财经资讯
+      </h2>
+      <div class="space-y-4">
+        {latestNews.map(news => (
+          <div class="border-b border-gray-100 pb-2 last:border-0">
+            <a href={`/blog/${news.slug}`} class="hover:text-primary">
+              <h3 class="font-medium">{news.data.title}</h3>
+              <p class="text-sm text-gray-500">{new Date(news.data.publishDate).toLocaleDateString()}</p>
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 项目进度卡片 -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+        项目进度
+      </h2>
+      <div class="space-y-4">
+        {projects.map(project => (
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="font-medium">{project.name}</span>
+              <span class="text-sm text-gray-500">{project.progress}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                class={`h-2 rounded-full transition-all duration-500 ${
+                  project.status === 'complete' ? 'bg-green-500' :
+                  project.status === 'warning' ? 'bg-yellow-500' :
+                  'bg-blue-500'
+                }`}
+                style={`width: ${project.progress}%`}
+              >
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- 日历安排卡片 -->
+    <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        七日安排
+      </h2>
+      
+      <div class="flex overflow-x-auto pb-2 -mx-2 scrollbar-thin">
+        {nextSevenDays.map((day, index) => (
+          <div class={`flex-none w-[calc(100%/7-0.5rem)] mx-2 ${
+            index === 0 ? 'bg-primary bg-opacity-5' : ''
+          }`}>
+            <div class={`text-center p-2 rounded-t-lg ${
+              index === 0 ? 'bg-primary text-white' : 'bg-gray-100'
+            }`}>
+              <div class="text-sm font-bold">{day.dayName}</div>
+              <div class="text-xs opacity-80">{day.dayNumber}日</div>
+            </div>
+            
+            <div class="mt-2 space-y-1">
+              {day.schedules.map(schedule => (
+                <div class="group relative bg-gray-50 hover:bg-gray-100 rounded p-1 cursor-pointer text-xs">
+                  <div class="flex items-center">
+                    <div class={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                      schedule.type === 'meeting' ? 'bg-blue-500' :
+                      schedule.type === 'review' ? 'bg-purple-500' :
+                      'bg-green-500'
+                    }`}></div>
+                    <div class="truncate">{schedule.time}</div>
+                  </div>
+                  <div class="truncate font-medium">{schedule.event}</div>
+                  
+                  <!-- 悬浮时显示完整信息 -->
+                  <div class="hidden group-hover:block absolute left-0 top-full mt-1 z-10 w-48 p-2 bg-white rounded-lg shadow-lg text-sm">
+                    <div class="font-bold">{schedule.event}</div>
+                    <div class="text-gray-600">{schedule.time}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+// 模拟获取天气数据
+function getWeather() {
+  // 实际项目中应该调用天气 API
+  const temperature = '23°C';
+  document.getElementById('temperature').textContent = temperature;
+}
+
+// 添加市场数据更新模拟
+function updateMarketData() {
+  // 实际项目中应该通过 WebSocket 或 API 获取实时数据
+  setInterval(() => {
+    // 模拟数据更新
+    const randomChange = (Math.random() * 2 - 1).toFixed(2);
+    // 在实际项目中，这里应该更新DOM中的数据
+  }, 5000);
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', () => {
+  getWeather();
+  updateMarketData();
+});
+</script>
+
+<style>
+  .grid {
+    min-height: calc(100vh - 4rem);
+  }
+
+  /* 添加玻璃态效果 */
+  .bg-gradient-to-r {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* 添加悬浮动画 */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .group:hover {
+    animation: float 2s ease-in-out infinite;
+  }
+
+  /* 添加日历卡片的特殊样式 */
+  .bg-opacity-10 {
+    backdrop-filter: blur(8px);
+  }
+  
+  /* 添加日历项目的悬浮效果 */
+  .bg-white.bg-opacity-60 {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .bg-white.bg-opacity-60:hover {
+    transform: translateX(4px);
+    background-opacity: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  /* 自定义滚动条样式 */
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #666;
+  }
+
+  /* 确保悬浮卡片显示在顶层 */
+  .group {
+    position: relative;
+  }
+
+  .group:hover .absolute {
+    z-index: 50;
+  }
+</style>

@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+---
+
+<BaseLayout title="博客文章">
+  <h1 class="text-3xl font-bold mb-8">博客文章</h1>
+  <div class="grid gap-8">
+    {posts.map(post => (
+      <article class="border rounded-lg p-6 hover:shadow-lg transition-shadow">
+        <h2 class="text-2xl font-bold mb-2">
+          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+        </h2>
+        <div class="text-gray-600 mb-4">
+          <time>{new Date(post.data.publishDate).toLocaleDateString()}</time>
+          {post.data.tags.map(tag => (
+            <span class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <p class="text-gray-700">{post.data.description}</p>
+      </article>
+    ))}
+  </div>
+</BaseLayout> 

@@ -1,0 +1,28 @@
+---
+const navItems = [
+  { href: '/', text: '首页' },
+  { href: '/blog', text: '博客' },
+  { href: '/projects', text: '作品' },
+  { href: '/about', text: '关于' },
+];
+---
+
+<header class="bg-white shadow">
+  <nav class="container mx-auto px-4 py-4">
+    <div class="flex justify-between items-center">
+      <a href="/" class="text-xl font-bold text-primary">我的博客</a>
+      <ul class="flex space-x-6">
+        {navItems.map(item => (
+          <li>
+            <a 
+              href={item.href}
+              class="text-gray-600 hover:text-primary transition-colors"
+            >
+              {item.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+</header> 
